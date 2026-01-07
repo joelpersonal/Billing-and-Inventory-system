@@ -17,7 +17,7 @@ export const users = [
   {
     id: 2,
     email: 'staff@billfinity.com',     
-    password: 'Staff@2026',   
+    password: 'Staff@1234',   
     role: 'staff',
     name: 'Staff Member',              
     permissions: ['dashboard', 'inventory', 'billing'],
