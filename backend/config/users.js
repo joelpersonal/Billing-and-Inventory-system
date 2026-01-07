@@ -20,7 +20,7 @@ export const users = [
     password: 'Staff@2026',   
     role: 'staff',
     name: 'Staff Member',              
-    permissions: ['dashboard', 'inventory', 'billing', 'reports'],
+    permissions: ['dashboard', 'inventory', 'billing'],
     avatar: 'S'                        
   }
 ];
