@@ -1,0 +1,76 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { connectDB } from './utils/database.js';
+import { errorHandler } from './middleware/errorHandler.js';
+
+// Import routes
+import authRoutes from './routes/auth.js';
+import dashboardRoutes from './routes/dashboard.js';
+import productRoutes from './routes/products.js';
+import orderRoutes from './routes/orders.js';
+import pdfRoutes from './routes/pdf.js';
+import aiRoutes from './routes/ai.js';
+
+// Load environment variables
+dotenv.config();
+
+// Create Express app
+const app = express();
+
+// Connect to database
+connectDB();
+
+// Middleware
+app.use(cors({
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5173'
+  ],
+  credentials: true
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/pdf', pdfRoutes);
+app.use('/api/ai', aiRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Billfinity API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
+  });
+});
+
+// Error handling middleware
+app.use(errorHandler);
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Billfinity API Server running on port ${PORT}`);
+  console.log(`📊 Dashboard: http://localhost:${PORT}/api/dashboard`);
+  console.log(`🔐 Auth: http://localhost:${PORT}/api/auth`);
+  console.log(`📦 Products: http://localhost:${PORT}/api/products`);
+  console.log(`🧾 Orders: http://localhost:${PORT}/api/orders`);
+  console.log(`📄 PDF: http://localhost:${PORT}/api/pdf`);
+  console.log(`🤖 AI: http://localhost:${PORT}/api/ai`);
+});
+
+export default app;
