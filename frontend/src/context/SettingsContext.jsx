@@ -15,7 +15,7 @@ export const SettingsProvider = ({ children }) => {
   const defaultSettings = {
     businessInfo: {
       businessName: 'Billfinity Store',
-      gstNumber: '33ABCDE1234F1Z5',
+      gstNumber: '33ABCDE1234F5',
       phone: '+91 98765 43210',
       email: 'admin@billfinity.com',
       website: 'https://billfinity.com',
