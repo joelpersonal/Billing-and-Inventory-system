@@ -1,5 +1,4 @@
 // 🔧 BACKEND USER CONFIGURATION
-// This mirrors the frontend user config for database seeding
 
 export const users = [
   // 👤 ADMIN USER - Full access to all features
