@@ -1,5 +1,5 @@
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '/api' 
+  ? 'https://billfinity-easy-billing.vercel.app/api' 
   : 'http://localhost:5001/api';
 
 class ApiService {
