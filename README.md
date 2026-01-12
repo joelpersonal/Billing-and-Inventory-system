@@ -1,306 +1,241 @@
-# 🏢 Billfinity - Complete Billing & Inventory Management System
+# 🏢 Billfinity - Smart Inventory Control & Billing System
 
-A modern, full-stack billing and inventory management system built with React, Node.js, and MongoDB. Features voice-assisted billing, AI-powered search, automated reorders, and comprehensive reporting.
+A comprehensive inventory management and billing system built with React, featuring JWT authentication, role-based access control, and a beautiful purple-themed UI.
+
+![Billfinity Logo](https://img.shields.io/badge/Billfinity-Smart%20Inventory%20System-8B5CF6?style=for-the-badge&logo=react)
 
 ## ✨ Features
 
-### 🎤 Voice-Assisted Billing
-- Voice commands for adding/removing items
-- Natural language processing
-- Manual price setting for voice-added items
-- Real-time voice feedback
-
-### 📦 Inventory Management
-- Real-time stock tracking
-- Low stock alerts
-- Automated reorder system
-- Manual reorder creation
-- Supplier management
-
-### 🧾 Smart Invoicing
-- PDF generation and email delivery
-- Invoice timeline tracking
-- Smart insights with AI analysis
-- Customer management
-
-### 🤖 AI Integration
-- Free Hugging Face API integration
-- Intelligent search suggestions
-- Context-aware responses
-- Fallback system for reliability
+### 🔐 Authentication & Security
+- **JWT Authentication** with token refresh
+- **Role-based Access Control** (Admin & Staff)
+- **Secure Login System** with manual credential entry
+- **Session Management** with auto-logout
 
 ### 📊 Dashboard & Analytics
-- Real-time business metrics
-- Sales revenue tracking
-- Product performance analytics
-- Interactive charts and graphs
+- **Real-time Analytics** with interactive charts
+- **Business Insights** with trend analysis
+- **Performance Metrics** with visual indicators
+- **Recent Activity** tracking
 
-### 🔐 Authentication & Security
-- JWT-based authentication
-- Role-based access control (Admin/Staff)
-- Secure password handling
-- Session management
+### 📦 Inventory Management
+- **Product Catalog** with categories
+- **Stock Level Tracking** with alerts
+- **Low Stock Notifications** 
+- **Product Search & Filtering**
+- **Bulk Operations** support
 
-## 🚀 Live Demo
+### 💰 Billing & Invoicing
+- **Interactive Shopping Cart**
+- **Automated Tax Calculations** (GST support)
+- **Professional Invoice Generation**
+- **Customer Information Management**
+- **Payment Tracking**
 
-- **Frontend**: [https://billfinity.vercel.app](https://billfinity.vercel.app)
-- **API**: [https://billfinity.vercel.app/api](https://billfinity.vercel.app/api)
+### 📈 Reports & Analytics
+- **Sales Reports** with charts
+- **Revenue Analysis** 
+- **Category Performance** metrics
+- **Export Functionality**
+- **Print Support**
 
-### Demo Credentials
-- **Admin**: admin@billfinity.com / Admin@2026
-- **Staff**: staff@billfinity.com / Staff@2026
+### ⚙️ System Settings
+- **User Management** (Admin only)
+- **Business Configuration**
+- **Tax Settings**
+- **Notification Preferences**
 
-## 🛠️ Tech Stack
+## 🎨 Design Features
 
-### Frontend
-- **React 18** with Vite
-- **Tailwind CSS** for styling
-- **React Router** for navigation
-- **Context API** for state management
-- **React Icons** for UI icons
-
-### Backend
-- **Node.js** with Express
-- **MongoDB** with Mongoose
-- **JWT** for authentication
-- **Nodemailer** for email services
-- **PDFKit** for PDF generation
-
-### AI & Services
-- **Hugging Face API** (Free tier)
-- **Web Speech API** for voice recognition
-- **MongoDB Atlas** for cloud database
-
-## 📋 Prerequisites
-
-- Node.js 18+ and npm 8+
-- MongoDB Atlas account (free tier available)
-- Hugging Face account (free tier available)
+- **Professional Purple Theme** matching brand identity
+- **Responsive Design** for all devices
+- **Modern UI Components** with smooth animations
+- **Glassmorphism Effects** with backdrop blur
+- **Professional Typography** and spacing
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
-\`\`\`bash
-git clone https://github.com/joelpersonal/Billing-and-Inventory-system.git
-cd Billing-and-Inventory-system
-\`\`\`
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
 
-### 2. Install Dependencies
-\`\`\`bash
-npm run install:all
-\`\`\`
+### Installation
 
-### 3. Environment Setup
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/joelpersonal/Billing-and-Inventory-system.git
+   cd Billing-and-Inventory-system
+   ```
 
-Create \`backend/.env\`:
-\`\`\`env
-# Database
-MONGODB_URI=your_mongodb_atlas_connection_string
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# JWT
-JWT_SECRET=your_super_secret_jwt_key_here
+3. **Configure user credentials**
+   Edit `src/config/users.js` to set your login credentials:
+   ```javascript
+   export const users = [
+     {
+       id: 1,
+       email: 'your-email@domain.com',
+       password: 'your-secure-password',
+       role: 'admin',
+       name: 'Your Name',
+       permissions: ['dashboard', 'inventory', 'billing', 'reports', 'settings', 'user_management'],
+       avatar: 'Y'
+     }
+   ];
+   ```
 
-# Email (Optional - for invoice emails)
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USER=your_email@gmail.com
-MAIL_PASS=your_app_password
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-# AI Service
-HUGGINGFACE_API_KEY=your_huggingface_api_key
+5. **Open your browser**
+   Navigate to `http://localhost:5173`
 
-# Server
-PORT=5001
-NODE_ENV=development
-FRONTEND_URL=http://localhost:5173
-\`\`\`
+## 🔑 Default Access Levels
 
-### 4. Database Setup
-\`\`\`bash
-# Test MongoDB connection
-npm run test:connection
+### Administrator
+- **Full Access** to all features
+- **User Management** capabilities
+- **System Settings** access
+- **All Reports** and analytics
 
-# Seed sample data
-npm run seed
-\`\`\`
-
-### 5. Start Development
-\`\`\`bash
-# Start both frontend and backend
-npm run dev
-
-# Or start individually
-npm run dev:backend  # Backend on :5001
-npm run dev:frontend # Frontend on :5173
-\`\`\`
-
-## 🌐 Deployment
-
-### Vercel Deployment (Recommended)
-
-1. **Fork this repository**
-2. **Connect to Vercel**:
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Vercel will auto-detect the configuration
-
-3. **Set Environment Variables** in Vercel dashboard:
-   \`\`\`
-   MONGODB_URI=your_mongodb_atlas_connection_string
-   JWT_SECRET=your_jwt_secret
-   HUGGINGFACE_API_KEY=your_huggingface_key
-   NODE_ENV=production
-   \`\`\`
-
-4. **Deploy**: Vercel will automatically build and deploy both frontend and backend
-
-### Manual Deployment
-
-\`\`\`bash
-# Build frontend
-npm run build
-
-# Start production server
-npm start
-\`\`\`
+### Staff Member
+- **Limited Access** to core operations
+- **Dashboard** viewing
+- **Inventory Management**
+- **Billing Operations**
 
 ## 📁 Project Structure
 
-\`\`\`
-billfinity/
-├── frontend/                 # React frontend
-│   ├── src/
-│   │   ├── components/      # Reusable components
-│   │   ├── pages/          # Page components
-│   │   ├── context/        # React contexts
-│   │   ├── services/       # API services
-│   │   └── utils/          # Utility functions
-│   ├── public/             # Static assets
-│   └── package.json
-├── backend/                 # Node.js backend
-│   ├── controllers/        # Route controllers
-│   ├── models/            # MongoDB models
-│   ├── routes/            # API routes
-│   ├── services/          # Business logic
-│   ├── middleware/        # Custom middleware
-│   ├── utils/             # Utility functions
-│   └── package.json
-├── docs/                   # Documentation
-├── vercel.json            # Vercel configuration
-└── README.md
-\`\`\`
+```
+src/
+├── components/          # Reusable UI components
+│   ├── Logo.jsx        # Billfinity logo component
+│   ├── ProtectedRoute.jsx  # Route protection
+│   ├── Sidebar.jsx     # Navigation sidebar
+│   ├── StatCard.jsx    # Dashboard stat cards
+│   └── Topbar.jsx      # Top navigation bar
+├── config/             # Configuration files
+│   └── users.js        # User credentials config
+├── context/            # React context providers
+│   └── AuthContext.jsx # Authentication context
+├── data/               # Sample data
+│   ├── dashboard.js    # Dashboard sample data
+│   └── products.js     # Product sample data
+├── pages/              # Page components
+│   ├── Billing.jsx     # Billing & invoicing
+│   ├── Dashboard.jsx   # Main dashboard
+│   ├── Inventory.jsx   # Inventory management
+│   ├── LandingPage.jsx # Landing page
+│   ├── Login.jsx       # Authentication page
+│   ├── Reports.jsx     # Analytics & reports
+│   └── Settings.jsx    # System settings
+├── utils/              # Utility functions
+│   └── auth.js         # JWT authentication utilities
+├── App.jsx             # Main app component
+├── index.css           # Global styles
+└── main.jsx            # App entry point
+```
 
-## 🎯 Key Features Guide
+## 🛠️ Technologies Used
 
-### Voice-Assisted Billing
-1. Navigate to Billing page
-2. Enable voice in "Voice-Assisted Billing" section
-3. Say commands like:
-   - "add sugar" - adds 1 sugar
-   - "add 2 rice" - adds 2 rice
-   - "remove milk" - removes milk from cart
-4. Set prices manually for voice-added items
-
-### Inventory Management
-1. Go to Inventory Management
-2. Add/edit products with stock levels
-3. Set up automated reorders with reorder points
-4. Create manual reorders when needed
-
-### AI Search
-1. Use search boxes throughout the app
-2. Get intelligent suggestions based on context
-3. AI learns from your usage patterns
+- **Frontend Framework**: React 18
+- **Routing**: React Router DOM
+- **Styling**: Tailwind CSS
+- **Charts**: Recharts
+- **Icons**: Heroicons
+- **Authentication**: JWT (JSON Web Tokens)
+- **Build Tool**: Vite
+- **Package Manager**: npm
 
 ## 🔧 Configuration
 
-### MongoDB Atlas Setup
-1. Create free account at [mongodb.com](https://mongodb.com)
-2. Create new cluster
-3. Get connection string
-4. Add to \`.env\` file
+### Adding New Users
+Edit `src/config/users.js`:
+```javascript
+{
+  id: 3,
+  email: 'newuser@domain.com',
+  password: 'secure-password',
+  role: 'admin', // or 'staff'
+  name: 'New User Name',
+  permissions: ['dashboard', 'inventory', 'billing'],
+  avatar: 'N'
+}
+```
 
-### Hugging Face API Setup
-1. Create free account at [huggingface.co](https://huggingface.co)
-2. Generate API token
-3. Add to \`.env\` file
+### Customizing Permissions
+Available permissions:
+- `dashboard` - Dashboard access
+- `inventory` - Inventory management
+- `billing` - Billing operations
+- `reports` - Reports and analytics
+- `settings` - System settings
+- `user_management` - User management (admin only)
 
-### Email Configuration (Optional)
-1. Enable 2FA on Gmail
-2. Generate app password
-3. Add credentials to \`.env\`
+## 🚀 Deployment
 
-## 🐛 Troubleshooting
+### Build for Production
+```bash
+npm run build
+```
 
-### Common Issues
-
-**Database Connection Failed**
-\`\`\`bash
-# Test connection
-npm run test:connection
-
-# Check MongoDB Atlas IP whitelist
-# Ensure connection string is correct
-\`\`\`
-
-**Voice Commands Not Working**
-- Use Chrome, Edge, or Safari (Firefox has limited support)
-- Ensure microphone permissions are granted
-- Check browser console for errors
-
-**Build Errors**
-\`\`\`bash
-# Clear node_modules and reinstall
-rm -rf node_modules frontend/node_modules backend/node_modules
-npm run install:all
-\`\`\`
-
-## 📚 API Documentation
-
-### Authentication
-- \`POST /api/auth/login\` - User login
-- \`POST /api/auth/register\` - User registration
-- \`GET /api/auth/profile\` - Get user profile
-
-### Products
-- \`GET /api/products\` - Get all products
-- \`POST /api/products\` - Create product
-- \`PUT /api/products/:id\` - Update product
-- \`DELETE /api/products/:id\` - Delete product
-
-### Orders
-- \`GET /api/orders\` - Get all orders
-- \`POST /api/orders\` - Create order
-- \`PATCH /api/orders/:id/status\` - Update order status
-
-### Reorders
-- \`GET /api/reorders\` - Get all reorders
-- \`POST /api/reorders/manual\` - Create manual reorder
-- \`PATCH /api/reorders/:id/status\` - Update reorder status
+### Preview Production Build
+```bash
+npm run preview
+```
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create feature branch (\`git checkout -b feature/amazing-feature\`)
-3. Commit changes (\`git commit -m 'Add amazing feature'\`)
-4. Push to branch (\`git push origin feature/amazing-feature\`)
-5. Open Pull Request
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m 'Add some amazing feature'
+   ```
+4. **Push to the branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. **Open a Pull Request**
 
-## 📄 License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🆘 Support
 
-- [Hugging Face](https://huggingface.co) for free AI API
-- [MongoDB Atlas](https://mongodb.com) for cloud database
-- [Vercel](https://vercel.com) for hosting platform
-- [Tailwind CSS](https://tailwindcss.com) for styling framework
+If you encounter any issues or need help:
 
-## 📞 Support
+1. **Check the documentation** above
+2. **Clear browser cache** and localStorage
+3. **Use the "Clear Session" button** on login page if stuck
+4. **Create an issue** on GitHub
 
-For support, email support@billfinity.com or create an issue on GitHub.
+## 🎯 Roadmap
+
+- [ ] Backend API integration
+- [ ] Database connectivity
+- [ ] Email notifications
+- [ ] Advanced reporting
+- [ ] Mobile app
+- [ ] Multi-language support
+
+## 👥 Team
+
+- **Project Lead**: Joel Personal
+- **Contributors**: Welcome!
 
 ---
 
-**Made with ❤️ by the Billfinity Team**
+**Built with ❤️ for modern businesses worldwide**
+
+© 2024 Billfinity. All rights reserved.

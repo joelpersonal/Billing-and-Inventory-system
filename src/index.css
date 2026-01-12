@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* Billfinity Brand Colors */
+:root {
+  --billfinity-primary: #8B5CF6;
+  --billfinity-secondary: #A855F7;
+  --billfinity-accent: #C084FC;
+  --billfinity-dark: #6B21A8;
+  --billfinity-light: #E9D5FF;
+  --billfinity-gradient: linear-gradient(135deg, #8B5CF6 0%, #A855F7 50%, #C084FC 100%);
+  
+  /* Dynamic theme variables */
+  --color-primary: 139, 92, 246;
+  --color-secondary: 168, 85, 247;
+  --base-font-size: 16px;
+}
+
+/* Dark theme styles */
+.dark {
+  --tw-bg-opacity: 1;
+  background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+  color: rgb(243 244 246);
+}
+
+.dark .bg-white {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+.dark .text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(243 244 246 / var(--tw-text-opacity));
+}
+
+.dark .text-gray-600 {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+
+.dark .border-gray-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(55 65 81 / var(--tw-border-opacity));
+}
+
+/* Compact mode styles */
+.compact-mode {
+  --spacing-scale: 0.75;
+}
+
+.compact-mode .p-6 {
+  padding: calc(1.5rem * var(--spacing-scale));
+}
+
+.compact-mode .p-4 {
+  padding: calc(1rem * var(--spacing-scale));
+}
+
+.compact-mode .gap-6 {
+  gap: calc(1.5rem * var(--spacing-scale));
+}
+
+.compact-mode .gap-4 {
+  gap: calc(1rem * var(--spacing-scale));
+}
+
+/* Dynamic primary color support */
+.bg-purple-500 {
+  background-color: rgb(var(--color-primary)) !important;
+}
+
+.text-purple-600 {
+  color: rgb(var(--color-primary)) !important;
+}
+
+.border-purple-500 {
+  border-color: rgb(var(--color-primary)) !important;
+}
+
+.from-purple-500 {
+  --tw-gradient-from: rgb(var(--color-primary)) !important;
+  --tw-gradient-to: rgb(var(--color-primary) / 0) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.to-violet-500 {
+  --tw-gradient-to: rgb(var(--color-secondary)) !important;
+}
+
+/* Font size scaling */
+body {
+  font-size: var(--base-font-size);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--billfinity-accent);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--billfinity-secondary);
+}
+
+/* Professional animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Landing page specific animations */
+.hero-float {
+  animation: heroFloat 6s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Gradient text animation */
+.gradient-text {
+  background: linear-gradient(-45deg, #8B5CF6, #A855F7, #C084FC, #8B5CF6);
+  background-size: 400% 400%;
+  animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
