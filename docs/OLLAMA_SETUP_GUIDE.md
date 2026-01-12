@@ -1,53 +1,60 @@
-# 🤖 Ollama AI Integration Setup Guide
+# 🤖 ~~Ollama AI Integration Setup Guide~~ - DEPRECATED
 
-## Overview
-Billfinity now includes AI-powered search suggestions using Ollama with Llama models. The search box in Inventory Management, Billing & Invoices, Analytics & Reports, and System Settings pages will provide intelligent suggestions based on your queries.
+## ⚠️ NOTICE: This guide is deprecated
 
-## Prerequisites
-- Ollama installed on your system
-- Llama model downloaded
-- Backend server running
+**Billfinity now uses Claude AI instead of Ollama for better reliability and performance.**
 
-## Installation Steps
+**Please see: [CLAUDE_AI_SETUP_GUIDE.md](./CLAUDE_AI_SETUP_GUIDE.md)**
 
-### 1. Install Ollama
+---
 
-#### Windows:
-1. Download Ollama from: https://ollama.ai/download
-2. Run the installer
-3. Ollama will start automatically
+## Why We Switched to Claude AI:
 
-#### macOS:
+### Issues with Ollama:
+- ❌ **Local Installation Required**: Complex setup on different systems
+- ❌ **Resource Intensive**: High CPU/RAM usage
+- ❌ **Deployment Challenges**: Difficult to deploy on cloud platforms
+- ❌ **Reliability Issues**: Local server can crash or become unavailable
+- ❌ **Model Management**: Need to download and manage large model files
+
+### Benefits of Claude AI:
+- ✅ **Cloud-Based**: No local installation required
+- ✅ **Reliable**: 99.9% uptime SLA
+- ✅ **Fast**: Optimized API responses
+- ✅ **Production Ready**: Works on any hosting platform
+- ✅ **Cost Effective**: Pay only for usage (~$0.10-$2.00/month)
+- ✅ **Better AI**: More accurate and context-aware responses
+
+---
+
+## Migration Steps:
+
+If you were using Ollama, follow these steps to migrate to Claude:
+
+1. **Get Claude API Key**: Sign up at https://console.anthropic.com/
+2. **Update Environment Variables**: Replace Ollama config with Claude config
+3. **Remove Ollama**: Uninstall Ollama from your system (optional)
+4. **Test**: Verify AI features work with Claude
+
+### Environment Variable Changes:
+
+#### Old (Ollama):
 ```bash
-# Using Homebrew
-brew install ollama
-
-# Or download from https://ollama.ai/download
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
 ```
 
-#### Linux:
+#### New (Claude):
 ```bash
-curl -fsSL https://ollama.ai/install.sh | sh
+CLAUDE_API_KEY=sk-ant-your-api-key-here
+CLAUDE_MODEL=claude-3-haiku-20240307
 ```
 
-### 2. Download Llama Model
-```bash
-# Download Llama 3.2 (recommended)
-ollama pull llama3.2
+---
 
-# Or download other models
-ollama pull llama3.1
-ollama pull llama2
-```
+## Legacy Documentation (For Reference Only):
 
-### 3. Start Ollama Service
-```bash
-# Start Ollama (if not already running)
-ollama serve
-```
-
-### 4. Verify Installation
-```bash
+*The rest of this document contains the original Ollama setup instructions for reference purposes only. Do not follow these instructions for new installations.*
 # Test if Ollama is running
 curl http://localhost:11434/api/tags
 

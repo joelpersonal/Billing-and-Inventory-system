@@ -9,7 +9,10 @@
     "dev": "nodemon app.js",
     "seed": "node utils/seedData.js",
     "seed-users": "node scripts/seed-users-only.js",
-    "clear-products": "node utils/clearProducts.js"
+    "clear-products": "node utils/clearProducts.js",
+    "test-atlas": "node test-atlas-connection.js",
+    "create-users": "node scripts/create-default-users.js",
+    "update-passwords": "node scripts/update-passwords.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

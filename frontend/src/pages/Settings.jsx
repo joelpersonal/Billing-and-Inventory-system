@@ -388,9 +388,22 @@ export default function Settings() {
                               </div>
 
                               <div className="flex items-center justify-between p-4 bg-purple-50/50 rounded-xl border border-purple-100">
-                                <div>
-                                  <p className="font-medium text-gray-800">Auto-reorder</p>
-                                  <p className="text-sm text-gray-600">Automatically reorder products</p>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <p className="font-medium text-gray-800">Auto-reorder</p>
+                                    {preferences.autoReorder && (
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+                                        Active
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-600">
+                                    {preferences.autoReorder 
+                                      ? 'Real-time monitoring enabled - products will be automatically reordered when stock is low'
+                                      : 'Automatically reorder products when stock reaches reorder point'
+                                    }
+                                  </p>
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                   <input 

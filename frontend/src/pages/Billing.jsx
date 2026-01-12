@@ -1,6 +1,9 @@
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import BillfinityLogo from "../components/Logo";
+import SmartInvoiceInsights from "../components/SmartInvoiceInsights";
+import InvoiceTimeline from "../components/InvoiceTimeline";
+import VoiceAssistedBilling from "../components/VoiceAssistedBilling";
 import apiService from "../services/api";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -15,7 +18,8 @@ import {
   HiOutlineMinus,
   HiOutlineTrash,
   HiOutlinePrinter,
-  HiOutlineEnvelope
+  HiOutlineEnvelope,
+  HiOutlineClock
 } from "react-icons/hi2";
 
 export default function Billing() {
@@ -34,6 +38,12 @@ export default function Billing() {
   });
   const [loading, setLoading] = useState(false);
   const [actionType, setActionType] = useState(''); // 'print', 'email', or 'generate'
+  const [showInsights, setShowInsights] = useState(false);
+  const [invoiceInsights, setInvoiceInsights] = useState(null);
+  const [loadingInsights, setLoadingInsights] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [currentOrderNumber, setCurrentOrderNumber] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -99,8 +109,169 @@ export default function Billing() {
     setCartItems(items => items.filter(item => item._id !== id));
   };
 
+  // Voice Assistant Functions
+  const handleVoiceAddItem = (item) => {
+    console.log('🛒 Billing received voice item:', item);
+    
+    // Validate that we have a proper item
+    if (!item || !item._id || !item.name) {
+      console.error('❌ Invalid item received:', item);
+      return;
+    }
+    
+    // Check if item already exists in cart (by name for voice items)
+    const existingItem = cartItems.find(cartItem => 
+      cartItem.name.toLowerCase() === item.name.toLowerCase()
+    );
+    
+    if (existingItem) {
+      // Update quantity of existing item
+      console.log('📈 Updating existing item quantity');
+      setCartItems(items =>
+        items.map(cartItem =>
+          cartItem.name.toLowerCase() === item.name.toLowerCase()
+            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
+            : cartItem
+        )
+      );
+      
+      addNotification({
+        type: 'success',
+        title: 'Voice Command Executed',
+        message: `Updated ${item.name} quantity to ${existingItem.quantity + item.quantity}`,
+        icon: '🎤'
+      });
+    } else {
+      // Add new voice item to cart
+      console.log('✅ Adding NEW voice item to cart:', item);
+      
+      setCartItems(prevItems => {
+        const newItems = [...prevItems, item];
+        console.log('🛒 Updated cart items:', newItems);
+        return newItems;
+      });
+      
+      addNotification({
+        type: 'info',
+        title: 'Voice Item Added',
+        message: `Added ${item.quantity} ${item.unit} of ${item.name}. Please set the price manually.`,
+        icon: '🎤'
+      });
+    }
+  };
+
+  const handleVoiceRemoveItem = (id) => {
+    console.log('🗑️ Billing: Removing item with ID:', id);
+    
+    const itemToRemove = cartItems.find(item => item._id === id);
+    if (itemToRemove) {
+      console.log('✅ Found item to remove:', itemToRemove.name);
+      removeItem(id);
+      
+      addNotification({
+        type: 'info',
+        title: 'Voice Command Executed',
+        message: `Removed ${itemToRemove.name} via voice command`,
+        icon: '🎤'
+      });
+    } else {
+      console.log('❌ Item not found for removal');
+    }
+  };
+
+  const handleVoiceUpdateQuantity = (id, quantity, unit) => {
+    console.log('📝 Billing: Updating quantity for ID:', id, 'to:', quantity);
+    
+    setCartItems(items =>
+      items.map(item =>
+        item._id === id
+          ? { ...item, quantity: Number(quantity), unit: unit || item.unit }
+          : item
+      )
+    );
+    
+    const item = cartItems.find(item => item._id === id);
+    addNotification({
+      type: 'info',
+      title: 'Voice Command Executed',
+      message: `Updated ${item?.name || 'item'} quantity to ${quantity} ${unit || 'pieces'}`,
+      icon: '🎤'
+    });
+  };
+
+  const handleVoiceClearAll = () => {
+    setCartItems([]);
+    addNotification({
+      type: 'warning',
+      title: 'Voice Command Executed',
+      message: 'All items cleared via voice command',
+      icon: '🎤'
+    });
+  };
+
+  const handleVoiceShowTotal = () => {
+    addNotification({
+      type: 'info',
+      title: 'Current Total',
+      message: `Subtotal: ${formatCurrency(subtotal)}, Tax: ${formatCurrency(tax)}, Total: ${formatCurrency(total)}`,
+      icon: '💰'
+    });
+  };
+
   const handleCustomerInfoChange = (field, value) => {
     setCustomerInfo(prev => ({ ...prev, [field]: value }));
+  };
+
+  const fetchInvoiceInsights = async (orderId) => {
+    try {
+      setLoadingInsights(true);
+      const response = await apiService.getInvoiceInsights(orderId, cartItems);
+      if (response.success) {
+        setInvoiceInsights(response.data.insights);
+        // Small delay to make the insights feel more "intelligent"
+        setTimeout(() => {
+          setShowInsights(true);
+          setLoadingInsights(false);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error fetching invoice insights:', error);
+      setLoadingInsights(false);
+      // Don't show error to user, insights are optional
+    }
+  };
+
+  const showInvoiceTimeline = (orderNumber, orderId) => {
+    setCurrentOrderNumber(orderNumber);
+    setCurrentOrderId(orderId);
+    setShowTimeline(true);
+  };
+
+  // Demo function to add sample timeline events for demonstration
+  const addSampleTimelineEvents = async (orderId) => {
+    if (!orderId) return;
+    
+    try {
+      // Add discount event (10% discount)
+      await apiService.addTimelineEvent(
+        orderId,
+        'discount_applied',
+        'Discount applied (10%)',
+        { discountAmount: (total * 0.1).toFixed(2), discountType: '10% off' }
+      );
+
+      // Add payment event (UPI payment)
+      setTimeout(async () => {
+        await apiService.addTimelineEvent(
+          orderId,
+          'payment_received',
+          'Payment received via UPI',
+          { paymentMethod: 'UPI', amount: total.toFixed(2) }
+        );
+      }, 1000);
+    } catch (error) {
+      console.error('Error adding sample timeline events:', error);
+    }
   };
 
   const generateInvoice = async () => {
@@ -121,19 +292,43 @@ export default function Billing() {
       const response = await apiService.createOrder(orderData);
       
       if (response.success) {
+        const order = response.data.order;
+        
         showSuccess(
           'Invoice Generated',
           'Your invoice has been successfully generated and is ready for download or email.'
         );
         
-        // Add notification for invoice generation
+        // Add notification for invoice generation with timeline button
         addNotification({
           type: 'success',
           title: 'Invoice Generated',
-          message: `Invoice created for ${customerInfo.name || 'customer'} - ${formatCurrency(total)}`,
+          message: `Invoice ${order.orderNumber} created for ${customerInfo.name || 'customer'} - ${formatCurrency(total)}`,
           icon: '🧾',
-          action: 'View Invoices'
+          action: 'View Timeline',
+          onClick: () => showInvoiceTimeline(order.orderNumber, order._id)
         });
+
+        // Add notification for insights generation
+        addNotification({
+          type: 'info',
+          title: 'Generating Smart Insights',
+          message: 'AI is analyzing your sale data to provide intelligent insights...',
+          icon: '🤖',
+          action: 'View Insights'
+        });
+
+        // Store order details for timeline access
+        setCurrentOrderNumber(order.orderNumber);
+        setCurrentOrderId(order._id);
+
+        // Add sample timeline events for demo
+        setTimeout(() => {
+          addSampleTimelineEvents(order._id);
+        }, 2000);
+
+        // Fetch and show smart insights
+        await fetchInvoiceInsights(order._id);
         
         setCartItems([]);
         setCustomerInfo({ name: '', phone: '', email: '' });
@@ -166,12 +361,13 @@ export default function Billing() {
     try {
       const totals = { subtotal, tax, total };
       
-      // Generate PDF using backend
+      // Generate PDF using backend with orderId for timeline tracking
       const pdfBlob = await apiService.generateInvoicePDF(
         cartItems, 
         customerInfo, 
         settings.businessInfo, 
-        totals
+        totals,
+        currentOrderId // Pass orderId for timeline tracking
       );
       
       // Create download link
@@ -239,7 +435,8 @@ export default function Billing() {
         cartItems, 
         customerInfo, 
         settings.businessInfo, 
-        totals
+        totals,
+        currentOrderId // Pass orderId for timeline tracking
       );
       
       if (response.success) {
@@ -297,6 +494,19 @@ export default function Billing() {
         <Topbar title="Billing & Invoices" searchContext="billing" />
 
         <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Voice-Assisted Billing */}
+          <div className="lg:col-span-3 mb-6">
+            <VoiceAssistedBilling
+              cartItems={cartItems}
+              onAddItem={handleVoiceAddItem}
+              onRemoveItem={handleVoiceRemoveItem}
+              onUpdateQuantity={handleVoiceUpdateQuantity}
+              onClearAll={handleVoiceClearAll}
+              onShowTotal={handleVoiceShowTotal}
+              products={products}
+            />
+          </div>
 
           {/* Product Search & Cart */}
           <div className="lg:col-span-2 space-y-6">
@@ -397,9 +607,52 @@ export default function Billing() {
                   {cartItems.map((item) => (
                     <div key={item._id} className="flex items-center gap-4 p-4 bg-purple-50/50 rounded-xl border border-purple-100">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                          {item.isVoiceAdded && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                              🎤 Voice
+                            </span>
+                          )}
+                          {item.price === 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                              ⚠️ Set Price
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-purple-600">{item.category}</p>
-                        <p className="text-sm font-semibold text-gray-700">{formatCurrency(item.price)} each</p>
+                        
+                        {/* Price Input for Voice Items */}
+                        {item.isVoiceAdded ? (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-sm text-gray-600">Price:</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={item.price}
+                              onChange={(e) => {
+                                const newPrice = parseFloat(e.target.value) || 0;
+                                setCartItems(items =>
+                                  items.map(cartItem =>
+                                    cartItem._id === item._id
+                                      ? { ...cartItem, price: newPrice }
+                                      : cartItem
+                                  )
+                                );
+                              }}
+                              className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-300"
+                              placeholder="0.00"
+                            />
+                            <span className="text-sm text-gray-600">each</span>
+                          </div>
+                        ) : (
+                          <p className="text-sm font-semibold text-gray-700">{formatCurrency(item.price)} each</p>
+                        )}
+                        
+                        {item.sku && (
+                          <p className="text-xs text-gray-500">SKU: {item.sku}</p>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-2">
@@ -519,11 +772,11 @@ export default function Billing() {
                 )}
               </button>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={printInvoice}
                   disabled={cartItems.length === 0 || loading}
-                  className="flex items-center justify-center gap-1 py-2 px-3 rounded-lg text-sm font-medium
+                  className="flex items-center justify-center gap-1 py-2 px-2 rounded-lg text-sm font-medium
                            border-2 border-purple-200 text-purple-600 hover:bg-purple-50
                            disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
@@ -543,7 +796,7 @@ export default function Billing() {
                 <button
                   onClick={emailInvoice}
                   disabled={cartItems.length === 0 || loading}
-                  className="flex items-center justify-center gap-1 py-2 px-3 rounded-lg text-sm font-medium
+                  className="flex items-center justify-center gap-1 py-2 px-2 rounded-lg text-sm font-medium
                            border-2 border-purple-200 text-purple-600 hover:bg-purple-50
                            disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
@@ -559,12 +812,39 @@ export default function Billing() {
                     </>
                   )}
                 </button>
+
+                <button
+                  onClick={() => showInvoiceTimeline(currentOrderNumber, currentOrderId)}
+                  disabled={!currentOrderNumber && !currentOrderId}
+                  className="flex items-center justify-center gap-1 py-2 px-2 rounded-lg text-sm font-medium
+                           border-2 border-purple-200 text-purple-600 hover:bg-purple-50
+                           disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="View invoice timeline"
+                >
+                  <HiOutlineClock size={16} />
+                  Timeline
+                </button>
               </div>
             </div>
           </div>
 
         </div>
       </div>
+
+      {/* Smart Invoice Insights Modal */}
+      <SmartInvoiceInsights 
+        insights={invoiceInsights}
+        isVisible={showInsights}
+        onClose={() => setShowInsights(false)}
+      />
+
+      {/* Invoice Timeline Modal */}
+      <InvoiceTimeline
+        isVisible={showTimeline}
+        onClose={() => setShowTimeline(false)}
+        orderNumber={currentOrderNumber}
+        orderId={currentOrderId}
+      />
     </div>
   );
 }

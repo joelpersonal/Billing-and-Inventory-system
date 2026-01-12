@@ -1,6 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import BillfinityLogo from "../components/Logo";
+import ReorderManagement from "../components/ReorderManagement";
 import apiService from "../services/api";
 import { useState, useEffect } from "react";
 import { useSettings } from "../context/SettingsContext";
@@ -12,7 +13,8 @@ import {
   HiOutlineAdjustmentsHorizontal,
   HiOutlinePencilSquare,
   HiOutlineTrash,
-  HiOutlineEye
+  HiOutlineEye,
+  HiOutlineClipboardDocumentList
 } from "react-icons/hi2";
 
 export default function Inventory() {
@@ -34,6 +36,7 @@ export default function Inventory() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showReorderModal, setShowReorderModal] = useState(false);
   const [filters, setFilters] = useState({
     categories: [],
     stockStatus: [],
@@ -365,6 +368,14 @@ export default function Inventory() {
               >
                 <HiOutlinePlus size={18} />
                 Add New Product
+              </button>
+              
+              <button 
+                onClick={() => setShowReorderModal(true)}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 shadow-lg shadow-blue-200"
+              >
+                <HiOutlineClipboardDocumentList size={18} />
+                Manage Reorders
               </button>
               
               <button 
@@ -914,6 +925,12 @@ export default function Inventory() {
           </div>
         </div>
       )}
+
+      {/* Reorder Management Modal */}
+      <ReorderManagement 
+        isVisible={showReorderModal}
+        onClose={() => setShowReorderModal(false)}
+      />
     </div>
   );
 }

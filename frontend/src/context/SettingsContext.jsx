@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import autoReorderMonitor from '../services/autoReorderMonitor.js';
 
 const SettingsContext = createContext();
 
@@ -70,7 +71,7 @@ export const SettingsProvider = ({ children }) => {
     }
   }, []);
 
-  // Apply theme changes to document
+  // Apply theme changes to document and handle auto reorder monitoring
   useEffect(() => {
     const root = document.documentElement;
     
@@ -107,7 +108,14 @@ export const SettingsProvider = ({ children }) => {
     } else {
       root.classList.remove('compact-mode');
     }
-  }, [settings.appearance]);
+
+    // Handle auto reorder monitoring
+    if (settings.preferences.autoReorder) {
+      autoReorderMonitor.start(settings);
+    } else {
+      autoReorderMonitor.stop();
+    }
+  }, [settings.appearance, settings.preferences.autoReorder]);
 
   const updateSettings = async (newSettings) => {
     setLoading(true);

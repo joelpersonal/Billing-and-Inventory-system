@@ -4,7 +4,8 @@ import {
   getAllOrders,
   getOrderById,
   createOrder,
-  updateOrderStatus
+  updateOrderStatus,
+  getInvoiceInsights
 } from '../controllers/orderController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 
@@ -31,5 +32,6 @@ router.get('/', getAllOrders);
 router.get('/:id', getOrderById);
 router.post('/', orderValidation, createOrder);
 router.patch('/:id/status', authorize('admin', 'manager'), statusValidation, updateOrderStatus);
+router.post('/:orderId/insights', getInvoiceInsights);
 
 export default router;

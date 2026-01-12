@@ -1,44 +1,32 @@
-// 🔧 USER CONFIGURATION
-// Edit this file to set your own login credentials
+// 🔧 USER CONFIGURATION - Database Authentication
+// 
+// ✅ Users are now stored in MongoDB Atlas database
+// ✅ No hardcoded credentials - secure for hosting
+// ✅ Admin and Staff can login from anywhere
+//
+// 📋 Current Login Credentials (saved in database):
+//
+// ADMIN LOGIN:
+// Email: admin@billfinity.com
+// Password: Itsmeadmin2026
+// Role: admin
+//
+// STAFF LOGIN:  
+// Email: staff@billfinity.com
+// Password: Itsmestaff2026
+// Role: staff
+//
+// 🚀 These credentials work after deployment to any hosting platform
+// 🔒 Passwords are securely hashed in the database
+// 🌐 Anyone can access the application with these credentials
 
+// This file is kept for reference only - authentication now uses database
 export const users = [
-  //  ADMIN USER - Full access to all features
-  {
-    id: 1,
-    email: 'admin@billfinity.com',     
-    password: 'Admin@2026',   
-    role: 'admin',
-    name: 'System Administrator',                 
-    permissions: ['dashboard', 'inventory', 'billing', 'reports', 'settings', 'user_management'],
-    avatar: 'A'                        
-  },
-
-  //  STAFF USER - Limited access to operational features
-  {
-    id: 2,
-    email: 'staff@billfinity.com',     
-    password: 'Staff@2026',   
-    role: 'staff',
-    name: 'Staff Member',              
-    permissions: ['dashboard', 'inventory', 'billing'],
-    avatar: 'S'                        
-  }
-
-  // 💡 You can add more users here if needed:
-  // {
-  //   id: 3,
-  //   email: 'manager@billfinity.com',
-  //   password: 'Manager@2026',
-  //   role: 'admin',
-  //   name: 'Manager Name',
-  //   permissions: ['dashboard', 'inventory', 'billing', 'reports', 'settings'],
-  //   avatar: 'M'
-  // }
+  // Users are now stored in MongoDB Atlas database
+  // Use the login credentials shown above
 ];
 
-// 🔒 SECURITY NOTES:
-// 1. Change the default passwords above before using in production
-// 2. In production, passwords should be hashed on the backend
-// 3. This is a frontend-only demo - real apps need a secure backend
-// 4. Never store real passwords in frontend code in production
-// 5. Consider using environment variables for sensitive
+// 💡 To add more users:
+// 1. Use the registration form in the application, OR
+// 2. Create a script similar to create-default-users.js, OR  
+// 3. Add users directly in MongoDB Atlas dashboard

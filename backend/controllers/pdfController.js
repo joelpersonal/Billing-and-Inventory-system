@@ -1,6 +1,7 @@
 import { PDFService } from '../services/pdfService.js';
 import { EmailService } from '../services/emailService.js';
 import { DashboardService } from '../services/dashboardService.js';
+import { InvoiceTimelineService } from '../services/invoiceTimelineService.js';
 import Order from '../models/Order.js';
 
 export const generateBusinessReport = async (req, res) => {
@@ -33,7 +34,7 @@ export const generateBusinessReport = async (req, res) => {
 
 export const generateInvoicePDF = async (req, res) => {
   try {
-    const { cartItems, customerInfo, businessInfo, totals } = req.body;
+    const { cartItems, customerInfo, businessInfo, totals, orderId } = req.body;
 
     // Create order data structure for PDF generation
     const orderData = {
@@ -52,6 +53,15 @@ export const generateInvoicePDF = async (req, res) => {
 
     // Generate PDF
     const pdfBuffer = await PDFService.generateInvoice(orderData, businessInfo);
+
+    // Add timeline event if orderId is provided
+    if (orderId) {
+      try {
+        await InvoiceTimelineService.addPdfGeneratedEvent(orderId, req.user._id);
+      } catch (timelineError) {
+        console.error('Timeline PDF event failed:', timelineError);
+      }
+    }
 
     // Set response headers for download
     res.setHeader('Content-Type', 'application/pdf');
@@ -73,7 +83,7 @@ export const generateInvoicePDF = async (req, res) => {
 
 export const emailInvoice = async (req, res) => {
   try {
-    const { cartItems, customerInfo, businessInfo, totals } = req.body;
+    const { cartItems, customerInfo, businessInfo, totals, orderId } = req.body;
 
     if (!customerInfo.email) {
       return res.status(400).json({
@@ -108,6 +118,15 @@ export const emailInvoice = async (req, res) => {
       pdfBuffer,
       orderData.orderNumber
     );
+
+    // Add timeline event if orderId is provided
+    if (orderId && emailResult.success) {
+      try {
+        await InvoiceTimelineService.addEmailEvent(orderId, customerInfo.email, req.user._id);
+      } catch (timelineError) {
+        console.error('Timeline email event failed:', timelineError);
+      }
+    }
 
     if (emailResult.success) {
       res.json({
@@ -153,6 +172,13 @@ export const generateInvoice = async (req, res) => {
 
     // Generate PDF
     const pdfBuffer = await PDFService.generateInvoice(order, businessInfo);
+
+    // Add timeline event
+    try {
+      await InvoiceTimelineService.addPdfGeneratedEvent(orderId, req.user._id);
+    } catch (timelineError) {
+      console.error('Timeline PDF event failed:', timelineError);
+    }
 
     // Set response headers
     res.setHeader('Content-Type', 'application/pdf');

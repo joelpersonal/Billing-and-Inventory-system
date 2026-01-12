@@ -1,5 +1,8 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import { InvoiceInsightsService } from '../services/invoiceInsightsService.js';
+import { AutoReorderService } from '../services/autoReorderService.js';
+import { InvoiceTimelineService } from '../services/invoiceTimelineService.js';
 
 export const getAllOrders = async (req, res) => {
   try {
@@ -122,6 +125,32 @@ export const createOrder = async (req, res) => {
       .populate('products.product', 'name sku')
       .populate('createdBy', 'name email');
 
+    // Create invoice timeline
+    try {
+      await InvoiceTimelineService.createTimeline(order._id, orderNumber, req.user._id);
+      
+      // Add inventory update event
+      const productUpdates = orderItems.map(item => ({
+        productId: item.product,
+        quantityReduced: item.quantity
+      }));
+      await InvoiceTimelineService.addInventoryUpdateEvent(order._id, productUpdates, req.user._id);
+    } catch (timelineError) {
+      console.error('Timeline creation failed:', timelineError);
+      // Don't fail order creation if timeline fails
+    }
+
+    // Trigger auto reorder check after successful order creation
+    try {
+      const reorderResult = await AutoReorderService.checkAutoReorderTriggers(req.user._id);
+      if (reorderResult.success && reorderResult.reordersCreated > 0) {
+        console.log(`🔄 Auto reorder triggered: ${reorderResult.reordersCreated} reorders created`);
+      }
+    } catch (reorderError) {
+      console.error('Auto reorder check failed:', reorderError);
+      // Don't fail the order creation if reorder check fails
+    }
+
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
@@ -140,17 +169,32 @@ export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
     
+    const existingOrder = await Order.findById(req.params.id);
+    if (!existingOrder) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    const oldStatus = existingOrder.status;
+    
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true, runValidators: true }
     ).populate('products.product', 'name sku');
 
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: 'Order not found'
-      });
+    // Add timeline event for status change
+    try {
+      await InvoiceTimelineService.addStatusChangeEvent(
+        order._id, 
+        oldStatus, 
+        status, 
+        req.user._id
+      );
+    } catch (timelineError) {
+      console.error('Timeline status update failed:', timelineError);
     }
 
     res.json({
@@ -162,6 +206,39 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error updating order status',
+      error: error.message
+    });
+  }
+};
+
+export const getInvoiceInsights = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { cartItems } = req.body; // Cart items with product details for profit calculation
+
+    // Get the order
+    const order = await Order.findById(orderId)
+      .populate('products.product', 'name sku price');
+    
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // Generate insights
+    const insights = await InvoiceInsightsService.generateInvoiceInsights(order, cartItems);
+
+    res.json({
+      success: true,
+      data: { insights }
+    });
+  } catch (error) {
+    console.error('Error generating invoice insights:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error generating invoice insights',
       error: error.message
     });
   }

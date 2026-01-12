@@ -7,13 +7,8 @@ export default function AISearchBox({ context = 'general', placeholder = 'Search
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [aiStatus, setAiStatus] = useState({ connected: false, checked: false });
   const searchRef = useRef(null);
   const suggestionsRef = useRef(null);
-
-  useEffect(() => {
-    checkAIStatus();
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -30,22 +25,6 @@ export default function AISearchBox({ context = 'general', placeholder = 'Search
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const checkAIStatus = async () => {
-    try {
-      const response = await apiService.apiCall('/ai/status');
-      if (response.success) {
-        setAiStatus({ 
-          connected: response.data.ollama_connected, 
-          checked: true,
-          model: response.data.model 
-        });
-      }
-    } catch (error) {
-      console.error('AI status check failed:', error);
-      setAiStatus({ connected: false, checked: true });
-    }
-  };
 
   const fetchSuggestions = async (searchQuery) => {
     if (!searchQuery.trim()) {
@@ -64,10 +43,65 @@ export default function AISearchBox({ context = 'general', placeholder = 'Search
       }
     } catch (error) {
       console.error('Failed to fetch AI suggestions:', error);
-      setSuggestions([]);
+      // Provide fallback suggestions when API fails
+      setSuggestions(getFallbackSuggestions(searchQuery, context));
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Fallback suggestions when API is not available
+  const getFallbackSuggestions = (query, context) => {
+    const queryLower = query.toLowerCase();
+    
+    const fallbackSuggestions = {
+      inventory: [
+        { text: 'Add new product to inventory', type: 'action', icon: '➕' },
+        { text: 'Check low stock items', type: 'filter', icon: '⚠️' },
+        { text: 'View product categories', type: 'view', icon: '📂' },
+        { text: 'Update stock quantities', type: 'action', icon: '📝' },
+        { text: 'Search products by SKU', type: 'search', icon: '🔍' }
+      ],
+      billing: [
+        { text: 'Create new invoice', type: 'action', icon: '📄' },
+        { text: 'View pending payments', type: 'filter', icon: '💰' },
+        { text: 'Generate customer report', type: 'action', icon: '📊' },
+        { text: 'Send invoice via email', type: 'action', icon: '📧' },
+        { text: 'View invoice timeline', type: 'view', icon: '⏰' }
+      ],
+      reports: [
+        { text: 'Generate sales report', type: 'action', icon: '📈' },
+        { text: 'View inventory analytics', type: 'view', icon: '📊' },
+        { text: 'Export data to PDF', type: 'action', icon: '📄' },
+        { text: 'Check business performance', type: 'view', icon: '🎯' },
+        { text: 'Customer buying patterns', type: 'view', icon: '👥' }
+      ],
+      settings: [
+        { text: 'Update business information', type: 'action', icon: '🏢' },
+        { text: 'Manage user accounts', type: 'action', icon: '👥' },
+        { text: 'Configure system preferences', type: 'action', icon: '⚙️' },
+        { text: 'Set up notifications', type: 'action', icon: '🔔' },
+        { text: 'Configure tax settings', type: 'action', icon: '🧾' }
+      ],
+      general: [
+        { text: 'View dashboard overview', type: 'view', icon: '📊' },
+        { text: 'Search products by name', type: 'search', icon: '🔍' },
+        { text: 'Create new invoice', type: 'action', icon: '📄' },
+        { text: 'Check inventory levels', type: 'view', icon: '📦' },
+        { text: 'Generate business reports', type: 'action', icon: '📈' }
+      ]
+    };
+
+    const suggestions = fallbackSuggestions[context] || fallbackSuggestions.general;
+    
+    // Filter suggestions based on query
+    if (query && query.length > 1) {
+      return suggestions.filter(suggestion => 
+        suggestion.text.toLowerCase().includes(queryLower)
+      ).slice(0, 5);
+    }
+    
+    return suggestions.slice(0, 5);
   };
 
   const handleInputChange = (e) => {
@@ -111,19 +145,15 @@ export default function AISearchBox({ context = 'general', placeholder = 'Search
       <div className="relative">
         <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400" size={18} />
         
-        {aiStatus.connected && (
-          <HiOutlineSparkles className="absolute left-8 top-1/2 transform -translate-y-1/2 text-purple-500 animate-pulse" size={14} />
-        )}
-        
         <input
           type="text"
           value={query}
           onChange={handleInputChange}
           onFocus={handleFocus}
-          placeholder={aiStatus.connected ? `${placeholder} ✨` : placeholder}
-          className={`${aiStatus.connected ? 'pl-16' : 'pl-10'} pr-10 py-2 text-sm border border-purple-200 rounded-lg
+          placeholder={placeholder}
+          className="pl-10 pr-10 py-2 text-sm border border-purple-200 rounded-lg
                      focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-400
-                     bg-purple-50/50 placeholder-purple-400 w-64 transition-all duration-200`}
+                     bg-purple-50/50 placeholder-purple-400 w-64 transition-all duration-200"
         />
         
         {query && (
@@ -135,16 +165,6 @@ export default function AISearchBox({ context = 'general', placeholder = 'Search
           </button>
         )}
       </div>
-
-      {/* AI Status Indicator */}
-      {aiStatus.checked && (
-        <div className="absolute -bottom-6 left-0 text-xs flex items-center gap-1">
-          <div className={`w-2 h-2 rounded-full ${aiStatus.connected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-          <span className="text-gray-500">
-            {aiStatus.connected ? `AI: ${aiStatus.model}` : 'AI: Offline'}
-          </span>
-        </div>
-      )}
 
       {/* Suggestions Dropdown */}
       {showSuggestions && (suggestions.length > 0 || isLoading) && (

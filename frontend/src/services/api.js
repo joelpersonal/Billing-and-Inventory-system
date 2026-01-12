@@ -1,6 +1,6 @@
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? '/api' 
-  : 'http://localhost:5000/api';
+  : 'http://localhost:5001/api';
 
 class ApiService {
   constructor() {
@@ -158,6 +158,44 @@ class ApiService {
     });
   }
 
+  async getInvoiceInsights(orderId, cartItems) {
+    return this.apiCall(`/orders/${orderId}/insights`, {
+      method: 'POST',
+      body: JSON.stringify({ cartItems })
+    });
+  }
+
+  // Reorder endpoints
+  async getReorders(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = `/reorders${queryString ? `?${queryString}` : ''}`;
+    return this.apiCall(endpoint);
+  }
+
+  async getReorderStats() {
+    return this.apiCall('/reorders/stats');
+  }
+
+  async updateReorderStatus(id, status, updates = {}) {
+    return this.apiCall(`/reorders/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, ...updates })
+    });
+  }
+
+  async createManualReorder(productId, quantity, notes = '') {
+    return this.apiCall('/reorders/manual', {
+      method: 'POST',
+      body: JSON.stringify({ productId, quantity, notes })
+    });
+  }
+
+  async checkAutoReorderTriggers() {
+    return this.apiCall('/reorders/check-triggers', {
+      method: 'POST'
+    });
+  }
+
   // Health check
   async healthCheck() {
     return this.apiCall('/health');
@@ -179,11 +217,11 @@ class ApiService {
     return response.blob();
   }
 
-  async generateInvoicePDF(cartItems, customerInfo, businessInfo, totals) {
+  async generateInvoicePDF(cartItems, customerInfo, businessInfo, totals, orderId = null) {
     const response = await fetch(`${this.baseURL}/pdf/generate-invoice`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ cartItems, customerInfo, businessInfo, totals })
+      body: JSON.stringify({ cartItems, customerInfo, businessInfo, totals, orderId })
     });
 
     if (!response.ok) {
@@ -194,11 +232,11 @@ class ApiService {
     return response.blob();
   }
 
-  async emailInvoice(cartItems, customerInfo, businessInfo, totals) {
+  async emailInvoice(cartItems, customerInfo, businessInfo, totals, orderId = null) {
     const response = await fetch(`${this.baseURL}/pdf/email-invoice`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify({ cartItems, customerInfo, businessInfo, totals })
+      body: JSON.stringify({ cartItems, customerInfo, businessInfo, totals, orderId })
     });
 
     if (!response.ok) {
@@ -256,6 +294,22 @@ class ApiService {
 
   async getAIStatus() {
     return this.apiCall('/ai/status');
+  }
+
+  // Invoice Timeline endpoints
+  async getInvoiceTimeline(orderId) {
+    return this.apiCall(`/timeline/order/${orderId}`);
+  }
+
+  async getTimelineByOrderNumber(orderNumber) {
+    return this.apiCall(`/timeline/invoice/${orderNumber}`);
+  }
+
+  async addTimelineEvent(orderId, eventType, description, details = {}) {
+    return this.apiCall(`/timeline/order/${orderId}/event`, {
+      method: 'POST',
+      body: JSON.stringify({ eventType, description, details })
+    });
   }
 }
 

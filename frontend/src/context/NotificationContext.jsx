@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import apiService from '../services/api';
+import autoReorderMonitor from '../services/autoReorderMonitor';
 
 const NotificationContext = createContext();
 
@@ -212,6 +213,22 @@ export const NotificationProvider = ({ children }) => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     
+    // Set up auto reorder monitor listener
+    const handleAutoReorderEvent = (event) => {
+      if (event.type === 'reorders_created') {
+        addNotification({
+          type: 'info',
+          title: 'Auto Reorders Created',
+          message: `${event.count} automatic reorder${event.count > 1 ? 's' : ''} created for low stock items`,
+          icon: '🔄',
+          action: 'View Reorders',
+          priority: 'high'
+        });
+      }
+    };
+    
+    autoReorderMonitor.addListener(handleAutoReorderEvent);
+    
     // Add a test notification on mount
     setTimeout(() => {
       addNotification({
@@ -223,7 +240,10 @@ export const NotificationProvider = ({ children }) => {
       });
     }, 2000);
     
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      autoReorderMonitor.removeListener(handleAutoReorderEvent);
+    };
   }, []);
 
   const value = {

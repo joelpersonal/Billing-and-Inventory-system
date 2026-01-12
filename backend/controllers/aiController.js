@@ -36,14 +36,18 @@ export const getSearchSuggestions = async (req, res) => {
 
 export const checkAIStatus = async (req, res) => {
   try {
-    const isConnected = await aiService.checkOllamaConnection();
+    const connectionStatus = await aiService.checkAIConnection();
     
     res.json({
       success: true,
       data: {
-        ollama_connected: isConnected,
-        model: process.env.OLLAMA_MODEL || 'llama3.2',
-        url: process.env.OLLAMA_URL || 'http://localhost:11434'
+        connected: connectionStatus.connected,
+        provider: connectionStatus.provider,
+        message: connectionStatus.message,
+        model: process.env.AI_MODEL || 'microsoft/DialoGPT-medium',
+        service: 'Hugging Face (Free)',
+        fallbackAvailable: true,
+        huggingfaceConfigured: !!process.env.HUGGINGFACE_API_TOKEN && process.env.HUGGINGFACE_API_TOKEN !== 'your_huggingface_token_here'
       }
     });
   } catch (error) {
